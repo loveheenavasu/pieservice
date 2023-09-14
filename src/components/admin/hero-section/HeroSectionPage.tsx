@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../layout/Layout";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
@@ -10,13 +10,14 @@ import CloudUploadTwoToneIcon from "@mui/icons-material/CloudUploadTwoTone";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LogosSection from "./LogosSection";
 import { addHeader } from "@/services/header";
-import { addHero } from "@/services/hero";
+import { addHero, getHero, updateHero } from "@/services/hero";
 
 const HeroSectionPage = () => {
   const [selectedImageUrlBanner, setSelectedImageUrlBanner] = useState({
     imageUrl: "",
     extension: "",
   });
+  const [heroData, setHeroData] = useState(null);
 
   const handleFileSelect = (
     event: React.ChangeEvent<HTMLInputElement> | null
@@ -96,9 +97,33 @@ const HeroSectionPage = () => {
   const handleSave = async () => {
     await addHero({
       data: selectedImages,
-      heroSection: selectedImageUrlBanner
-    })
+      heroSection: selectedImageUrlBanner,
+    });
   };
+
+  useEffect(() => {
+    getHero().then((res) => {
+      setHeroData(res?.data);
+      setSelectedImageUrlBanner({
+        imageUrl: res?.data?.heroSectionLogo || "",
+      });
+      setSelectedImages([
+        { imageUrl: res?.data?.clientLogo1 || "" },
+        { imageUrl: res?.data?.clientLogo2 || "" },
+        { imageUrl: res?.data?.clientLogo3 || "" },
+        { imageUrl: res?.data?.clientLogo4 || "" },
+      ]);
+    });
+  }, []);
+
+  const handleUpdate =()=>{
+    updateHero({
+      data: selectedImages,
+      heroSection: selectedImageUrlBanner,
+    })
+  }
+
+  console.log(selectedImages, "selectedimages");
 
   return (
     <Layout>
@@ -115,6 +140,9 @@ const HeroSectionPage = () => {
                 mt: 7,
               }}
             >
+               <Button onClick={handleUpdate} variant="contained">
+                update
+              </Button>
               <Button onClick={handleSave} variant="contained">
                 Save
               </Button>
@@ -150,7 +178,7 @@ const HeroSectionPage = () => {
                     }}
                   >
                     <img
-                      src={selectedImageUrlBanner.imageUrl}
+                      src={selectedImageUrlBanner?.imageUrl}
                       alt="Selected Image"
                       style={{ maxWidth: "200px", maxHeight: "200px" }}
                     />

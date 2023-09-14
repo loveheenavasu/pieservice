@@ -15,7 +15,7 @@ const IstLogo = ({
   index, // Add the index prop to determine which image to display
 }: any) => {
 
-  console.log(selectedImageURLLogo?.imageURL,"imageURL");
+  console.log(selectedImageURLLogo?.imageUrl,"imageURL");
   
 
   return (
@@ -27,7 +27,7 @@ const IstLogo = ({
         position: "relative",
       }}
     >
-      {selectedImageURLLogo?.imageURL ? ( // Use imageURL to check if an image is available
+      {selectedImageURLLogo?.imageUrl ? ( // Use imageURL to check if an image is available
         <Box
           sx={{
             display: "flex",
@@ -38,7 +38,7 @@ const IstLogo = ({
           }}
         >
           <img
-            src={selectedImageURLLogo?.imageURL}
+            src={selectedImageURLLogo?.imageUrl}
             alt="Selected Image"
             style={{ maxWidth: "200px", maxHeight: "200px" }}
           />
@@ -90,7 +90,7 @@ const IstLogo = ({
               }}
             >
               <LibraryAddIcon fontSize="small" />
-              <Typography>Ist logo</Typography>
+              <Typography>First logo</Typography>
             </Box>
           </Box>
         </div>

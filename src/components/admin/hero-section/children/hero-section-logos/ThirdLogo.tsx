@@ -22,7 +22,7 @@ const ThirdLogo = ({
         position: "relative",
       }}
     >
-      {selectedImageURLLogo?.imageURL ? (
+      {selectedImageURLLogo?.imageUrl ? (
         <Box
           sx={{
             display: "flex",
@@ -33,7 +33,7 @@ const ThirdLogo = ({
           }}
         >
           <img
-            src={selectedImageURLLogo?.imageURL}
+            src={selectedImageURLLogo?.imageUrl}
             alt="Selected Image"
             style={{ maxWidth: "200px", maxHeight: "200px" }}
           />

@@ -90,10 +90,10 @@ const GeneralPage = () => {
                 <Typography sx={{ my: 2 }} variant="h4">
                   General
                 </Typography>
-                <Box>
+                <Box sx={{display:'flex', alignItems:'center'}}>
                     <Typography variant="h5" sx={{fontSize:'18px'}}> Enable Search</Typography>
                 <FormControlLabel
-                  control={<IOSSwitch sx={{ m: 1 , mt:2}} onChange={handleChange} />}
+                  control={<IOSSwitch sx={{ mx: 3  }} onChange={handleChange} />}
                   label=""
                 />
                 </Box>

@@ -13,3 +13,18 @@ export function addHeader({headerIcon, extension, links }: any) {
         // DO nothing
     }
 }
+
+
+export async function getHeader() {
+    try {
+        const response = await AXIOS.get('/header');
+
+        console.log(response.data, "reponsee");
+        return response // Access the response data
+        // You can perform additional actions with the response data here
+
+    } catch (error) {
+        console.error('An error occurred:', error);
+        // Handle the error or do nothing if you want to suppress it
+    }
+}

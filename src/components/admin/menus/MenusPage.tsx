@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Box,
@@ -17,12 +17,13 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import ControlPointDuplicateRoundedIcon from "@mui/icons-material/ControlPointDuplicateRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import Layout from "../layout/Layout";
-import { addMenus } from "@/services/menus";
+import { addMenus, getMenus } from "@/services/menus";
 
 const MenusPage = () => {
   const [selectedImageURLs, setSelectedImageURLs] = React.useState<
     Array<string>
   >([]);
+  const [menusData, setMenusData] = useState(null);
 
   const [formDataArray, setFormDataArray] = React.useState([
     {
@@ -54,7 +55,7 @@ const MenusPage = () => {
   };
 
   const handleSubmit = () => {
-    addMenus({menus: formDataArray})
+    addMenus({ menus: formDataArray });
   };
 
   const handleAddFields = () => {
@@ -71,13 +72,22 @@ const MenusPage = () => {
     });
   };
 
+  useEffect(() => {
+    getMenus().then((res) => {
+      setMenusData(res?.data)
+      setFormDataArray(res?.data)
+    } );
+  }, []);
+
   return (
     <>
       <Layout>
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={8} lg={12}>
-              <Box sx={{ display: "flex", justifyContent: "end", mx: 0, mt:7 }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "end", mx: 0, mt: 7 }}
+              >
                 <Button
                   variant="contained"
                   color="primary"
@@ -136,9 +146,7 @@ const MenusPage = () => {
                           label={"Menu Name"}
                           variant="outlined"
                           value={formData.name}
-                          onChange={(event) =>
-                            handlelinkChange(event, index)
-                          }
+                          onChange={(event) => handlelinkChange(event, index)}
                           name="name"
                           size="small"
                         />
@@ -152,9 +160,7 @@ const MenusPage = () => {
                           label={"Menu Link"}
                           variant="outlined"
                           value={formData.link}
-                          onChange={(event) =>
-                            handlelinkChange(event, index)
-                          }
+                          onChange={(event) => handlelinkChange(event, index)}
                           name="link"
                           size="small"
                         />

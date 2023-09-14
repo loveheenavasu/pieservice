@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Box,
@@ -15,12 +15,14 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import ControlPointDuplicateRoundedIcon from "@mui/icons-material/ControlPointDuplicateRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import UploadLogo from "./UploadLogo";
-import { addHeader } from "@/services/header";
+import { addHeader, getHeader } from "@/services/header";
 
 const HeaderLinks = () => {
   const [selectedImageURLs, setSelectedImageURLs] = React.useState<
     Array<string>
   >([]);
+
+  const [headerData, setHeaderData] = useState(null);
 
   const [formDataArray, setFormDataArray] = React.useState([
     {
@@ -37,6 +39,20 @@ const HeaderLinks = () => {
     imageURL: "",
     extension: "",
   });
+
+  useEffect(() => {
+    getHeader().then((res) => {
+      setHeaderData(res?.data);
+      setFormDataArray(res?.data?.data || []);
+      setSelectedImageURLLogo({
+        imageURL: res?.data?.headerLogo || "",
+      });
+    });
+  }, []);
+  console.log(formDataArray,"formdataarray");
+  
+  console.log(headerData, "headerdata");
+  console.log(selectedImageURLLogo, "hghg");
 
   const handleFileSelectLogo = (
     event: React.ChangeEvent<HTMLInputElement> | null
@@ -84,8 +100,8 @@ const HeaderLinks = () => {
           const newDataArray = [...prevDataArray];
           newDataArray[index] = {
             ...newDataArray[index],
-              extension: extension!,
-              icon: base64DataUrl,
+            extension: extension!,
+            icon: base64DataUrl,
           };
           return newDataArray;
         });
@@ -109,13 +125,32 @@ const HeaderLinks = () => {
       return newDataArray;
     });
   };
+  // const handleRemoveImage = (indexToRemove: number) => {
+  //   setFormDataArray((prevDataArray) => {
+  //     // Create a copy of the previous data array without the item to remove
+  //     const newDataArray = prevDataArray.filter((_, index) => index !== indexToRemove);
+  //     return newDataArray;
+  //   });
+  // };
+
   const handleRemoveImage = (indexToRemove: number) => {
-    setSelectedImageURLs((prevURLs) => {
-      const newURLs = [...prevURLs];
-      newURLs[indexToRemove] = ""; // Clear the URL at the specified index
-      return newURLs;
+    setFormDataArray((prevDataArray) => {
+      // Create a copy of the previous data array
+      const newDataArray = [...prevDataArray];
+  
+      // Create a copy of the object at the specified index
+      const updatedObject = { ...newDataArray[indexToRemove] };
+  
+      // Remove the 'icon' property from the object
+      delete updatedObject.icon;
+  
+      // Update the newDataArray with the modified object
+      newDataArray[indexToRemove] = updatedObject;
+  
+      return newDataArray;
     });
   };
+  
 
   // Handle submit
   const handleSubmit = async () => {
@@ -125,7 +160,7 @@ const HeaderLinks = () => {
       links: formDataArray,
       headerIcon: selectedImageURLLogo.imageURL,
       extension: selectedImageURLLogo.extension,
-    })
+    });
   };
 
   const handleAddFields = () => {
@@ -135,7 +170,7 @@ const HeaderLinks = () => {
         name: "",
         link: "",
         icon: "",
-        extension: ""
+        extension: "",
       };
 
       // Add the new field to the end of the array
@@ -195,8 +230,12 @@ const HeaderLinks = () => {
           </Button>
         </Box>
 
-        {formDataArray.map((formData, index) => (
-          <Box
+        {formDataArray.map((formData, index) => {
+          console.log(formData?.icon,"formdata.icon");
+          
+          return(
+
+            <Box
             key={index}
             sx={{
               display: "flex",
@@ -240,7 +279,7 @@ const HeaderLinks = () => {
                 variant="outlined"
                 sx={{ my: 0, width: "15%" }}
               >
-                {!selectedImageURLs[index] ? (
+                {!formData?.icon ? (
                   <>
                     <div
                       style={{
@@ -251,6 +290,7 @@ const HeaderLinks = () => {
                         margin: "20px 0px 30px 0",
                       }}
                     >
+                      
                       <Button
                         style={{
                           color: "#000",
@@ -286,7 +326,7 @@ const HeaderLinks = () => {
                     }}
                   >
                     <img
-                      src={selectedImageURLs[index]}
+                      src={ formData?.icon }
                       alt="Selected Image"
                       style={{ maxWidth: "60px", maxHeight: "60px" }}
                     />
@@ -307,7 +347,10 @@ const HeaderLinks = () => {
               </FormControl>
             </Box>
           </Box>
-        ))}
+          )
+          
+
+})}
       </Paper>
     </>
   );

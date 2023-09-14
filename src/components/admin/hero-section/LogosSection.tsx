@@ -13,9 +13,9 @@ const LogosSection = ({selectedImages,handleFileSelectLogo, removeImageByIndex}:
   return (
     <Box  sx={{mt:2}}>
     <Typography sx={{fontSize:"18px"}}>
-      Upload Logos
+     Trusted Client Logos
     </Typography>
-    <Box sx={{display:'flex', justifyContent:'center', width:'100%', gap:'20px'}}>
+    <Box sx={{display:'flex', justifyContent:'start', width:'100%', gap:'20px'}}>
      <IstLogo
         selectedImageURLLogo={selectedImages[0]}
         handleFileSelectLogo={handleFileSelectLogo}
