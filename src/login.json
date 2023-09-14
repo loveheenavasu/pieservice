@@ -1,0 +1,9 @@
+{
+    "user": {
+      "username": "dummyuser",
+      "email": "dummyuser@example.com",
+      "password": "abcd1234"
+    },
+    "token": "1234567890"
+  }
+  
