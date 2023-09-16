@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useEffect, useState } from "react";
 import {
@@ -5,8 +6,6 @@ import {
   Box,
   FormControl,
   Button,
-  Select,
-  MenuItem,
   Typography,
   Paper,
 } from "@mui/material";
@@ -16,15 +15,25 @@ import ControlPointDuplicateRoundedIcon from "@mui/icons-material/ControlPointDu
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import UploadLogo from "./UploadLogo";
 import { addHeader, getHeader } from "@/services/header";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { fileToBase64URL, getFileExtension, getImageURL } from "@/utils/images";
+
+interface FormDataType {
+  name: string;
+  link: string;
+  icon?: string;
+  extension?: string;
+  base64?: string;
+}
+
+interface HeaderImageProps {
+  headerLogo?: string;
+  extension?: string;
+  headerIconBase64?: string;
+}
 
 const HeaderLinks = () => {
-  const [selectedImageURLs, setSelectedImageURLs] = React.useState<
-    Array<string>
-  >([]);
-
-  const [headerData, setHeaderData] = useState(null);
-
-  const [formDataArray, setFormDataArray] = React.useState([
+  const [formDataArray, setFormDataArray] = React.useState<FormDataType[]>([
     {
       name: "",
       link: "",
@@ -32,83 +41,66 @@ const HeaderLinks = () => {
       extension: "",
     },
   ]);
-  console.log(formDataArray, "formDadddtadArray");
-  const [base64Image, setBase64Image] = useState("");
-  const [logoExtension, setLogoExtension] = useState<string | null>(null);
 
-  const [selectedImageURLLogo, setSelectedImageURLLogo] = useState({
-    imageURL: "",
-    extension: "",
-  });
+  const [selectedImageURLLogo, setSelectedImageURLLogo] =
+    useState<HeaderImageProps>({
+      headerLogo: "",
+      extension: "",
+      headerIconBase64: "",
+    });
 
   useEffect(() => {
     getHeader().then((res) => {
-      setHeaderData(res?.data);
       setFormDataArray(res?.data?.data);
       setSelectedImageURLLogo({
-        imageURL: res?.data?.headerLogo || "",
+        headerLogo: res?.data?.headerLogo || "",
+        extension: "",
       });
     });
   }, []);
-  console.log(formDataArray, "formdataarray");
 
-  console.log(headerData, "headerdata");
-  console.log(selectedImageURLLogo, "hghg");
-
-  const handleFileSelectLogo = (
+  const handleFileSelectLogo = async (
     event: React.ChangeEvent<HTMLInputElement> | null
   ) => {
     const file = event?.target?.files?.[0] || null;
 
     if (file) {
-      const extension = file.name.split(".").pop() || "";
+      const extension = getFileExtension(file);
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64DataUrl = e?.target?.result as string;
+      const base64 = await fileToBase64URL(file);
 
+      if (typeof base64 === "string") {
         setSelectedImageURLLogo({
-          imageURL: base64DataUrl,
+          headerLogo: "",
           extension,
+          headerIconBase64: base64,
         });
-      };
-      reader.readAsDataURL(file);
+      }
     }
   };
 
-  const handleFileSelect = (
+  const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
     const file = event.target.files?.[0] || null;
 
     if (file) {
-      const imageURL = URL.createObjectURL(file);
-      const extension = file.name.split(".").pop();
-
-      // Read the file as a base64 data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64DataUrl = e?.target?.result as string;
-
-        setSelectedImageURLs((prevURLs) => {
-          const newURLs = [...prevURLs];
-          newURLs[index] = imageURL;
-          return newURLs;
-        });
+      const base64 = await fileToBase64URL(file);
+      if (typeof base64 === "string") {
+        const extension = getFileExtension(file);
 
         setFormDataArray((prevDataArray) => {
           const newDataArray = [...prevDataArray];
           newDataArray[index] = {
             ...newDataArray[index],
-            extension: extension!,
-            icon: base64DataUrl,
+            extension: extension,
+            icon: "",
+            base64: base64,
           };
           return newDataArray;
         });
-      };
-
-      reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -126,26 +118,12 @@ const HeaderLinks = () => {
       return newDataArray;
     });
   };
-  // const handleRemoveImage = (indexToRemove: number) => {
-  //   setFormDataArray((prevDataArray) => {
-  //     // Create a copy of the previous data array without the item to remove
-  //     const newDataArray = prevDataArray.filter((_, index) => index !== indexToRemove);
-  //     return newDataArray;
-  //   });
-  // };
 
   const handleRemoveImage = (indexToRemove: number) => {
     setFormDataArray((prevDataArray) => {
-      // Create a copy of the previous data array
       const newDataArray = [...prevDataArray];
-
-      // Create a copy of the object at the specified index
       const updatedObject = { ...newDataArray[indexToRemove] };
-
-      // Remove the 'icon' property from the object
       delete updatedObject.icon;
-
-      // Update the newDataArray with the modified object
       newDataArray[indexToRemove] = updatedObject;
 
       return newDataArray;
@@ -154,15 +132,14 @@ const HeaderLinks = () => {
 
   // Handle submit
   const handleSubmit = async () => {
-    // Handle uploading file and saving data here
-    console.log("Header Link 1:", selectedImageURLLogo, formDataArray);
     await addHeader({
       links: formDataArray,
-      headerIcon: selectedImageURLLogo.imageURL,
+      headerIcon: selectedImageURLLogo.headerLogo,
       extension: selectedImageURLLogo.extension,
+      headerIconBase64: selectedImageURLLogo.headerIconBase64,
     });
   };
-  console.log(selectedImageURLLogo, "selectedImageURLLogo");
+
   const handleAddFields = () => {
     const newField = {
       name: "",
@@ -170,17 +147,23 @@ const HeaderLinks = () => {
       icon: "",
       extension: "",
     };
-    let data = [...formDataArray, newField];
+    let data = [...(formDataArray || []), newField];
     setFormDataArray(data);
   };
-  console.log(formDataArray, "fossrmDataArray");
+
   const handleRemoveImageLogo = () => {
     setSelectedImageURLLogo({
-      imageURL: "",
+      headerLogo: "",
       extension: "",
+      headerIconBase64: "",
     });
-    setBase64Image("");
   };
+
+  const handleDelete = (index: number) => {
+    const data = formDataArray?.filter((_, i) => i !== index);
+    setFormDataArray(data);
+  };
+
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "end", mx: 1 }}>
@@ -201,14 +184,12 @@ const HeaderLinks = () => {
           mt: 2,
         }}
       >
-        {console.log(
-          selectedImageURLLogo.imageURL,
-          "selectedImageURLLogo.imageURL"
-        )}
         <UploadLogo
-          selectedImageURLLogo={selectedImageURLLogo.imageURL}
+          selectedImageURLLogo={
+            selectedImageURLLogo.headerIconBase64 ||
+            selectedImageURLLogo.headerLogo
+          }
           handleFileSelectLogo={handleFileSelectLogo}
-          // base64Image={base64Image}
           handleRemoveImageLogo={handleRemoveImageLogo}
         />
         <Box
@@ -271,9 +252,9 @@ const HeaderLinks = () => {
                 <FormControl
                   key={index}
                   variant="outlined"
-                  sx={{ my: 0, width: "15%" }}
+                  sx={{ my: 0, width: "10%" }}
                 >
-                  {!formData?.icon ? (
+                  {!formData?.icon && !formData?.base64 ? (
                     <>
                       <div
                         style={{
@@ -319,7 +300,9 @@ const HeaderLinks = () => {
                       }}
                     >
                       <img
-                        src={`https://piemultilingualbackend.onrender.com/${formData?.icon}`}
+                        src={
+                          formData?.base64 || getImageURL(formData?.icon || "")
+                        }
                         alt="Selected Image"
                         style={{ maxWidth: "60px", maxHeight: "60px" }}
                       />
@@ -339,6 +322,14 @@ const HeaderLinks = () => {
                   )}
                 </FormControl>
               </Box>
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  handleDelete(index);
+                }}
+              >
+                <DeleteIcon />
+              </div>
             </Box>
           );
         })}

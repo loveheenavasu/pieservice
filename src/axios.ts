@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const AXIOS = axios.create({
-    baseURL: 'https://piemultilingualbackend.onrender.com',
-})
+  baseURL:
+    "http://localhost:8000" || "https://piemultilingualbackend.onrender.com",
+});
 
-export default AXIOS
+export default AXIOS;

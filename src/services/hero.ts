@@ -1,14 +1,35 @@
 import AXIOS from "@/axios";
 
+export enum RESPONSE_STATUS {
+  SUCCESS = "success",
+  FAILED = "failed",
+}
+export interface ImageStructure {
+  // _id?: string;
+  imageUrl?: string;
+  base64?: string;
+  extension?: string;
+}
+
+export interface AddHeroProps {
+  heroSection: ImageStructure;
+  data: ImageStructure[];
+}
+
 // TODO: add types
-export async function addHero({ heroSection, data }: any) {
+export async function addHero({ heroSection, data }: AddHeroProps) {
   try {
-    const response = await AXIOS.post("/heroSection", {
+    await AXIOS.post("/heroSection", {
       data,
       heroSection,
     });
+    return RESPONSE_STATUS.SUCCESS;
   } catch (error) {
-    // do Nothing
+    console.error(
+      error,
+      "Hero section image upload failed--- please check hero.ts"
+    );
+    return RESPONSE_STATUS.FAILED;
   }
 }
 

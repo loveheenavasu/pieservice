@@ -1,35 +1,31 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { Button, Box, Typography } from "@mui/material";
 import React from "react";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
-import CloudUploadTwoToneIcon from "@mui/icons-material/CloudUploadTwoTone";
+
 import CancelIcon from "@mui/icons-material/Cancel";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
-import { ImageOutlined } from "@mui/icons-material";
+import { getImageURL } from "@/utils/images";
 
-const IstLogo = ({
+interface LogoInputAndPreviewProps {
+  selectedImageURLLogo?: string;
+  handleFileSelectLogo: (
+    ev: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => void;
+  handleRemoveImageLogo: (index: number) => void;
+  index: number;
+}
+
+export function LogoInputAndPreview({
   selectedImageURLLogo,
   handleFileSelectLogo,
   handleRemoveImageLogo,
-  setSelectedImages,
-  index, // Add the index prop to determine which image to display
-}: any) => {
-  const isBase64Url = () => {
-    const regex =
-      /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-    let val = regex.test(selectedImageURLLogo);
-    let imgurl = "";
-    if (selectedImageURLLogo?.length > 500) {
-      imgurl = selectedImageURLLogo;
-    } else {
-      imgurl = `https://piemultilingualbackend.onrender.com/${selectedImageURLLogo}`;
-    }
-    console.log(imgurl, "asfksaldjflsjd", val);
-    return imgurl;
+  index,
+}: LogoInputAndPreviewProps) {
+  const handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelectLogo(ev, index);
   };
-
-  console.log(isBase64Url(selectedImageURLLogo), "0823402384");
   return (
     <Box
       sx={{
@@ -37,9 +33,10 @@ const IstLogo = ({
         flexDirection: "column",
         alignItems: "center",
         position: "relative",
+        zIndex: 0,
       }}
     >
-      {selectedImageURLLogo ? ( // Use imageURL to check if an image is available
+      {selectedImageURLLogo ? (
         <Box
           sx={{
             display: "flex",
@@ -50,17 +47,17 @@ const IstLogo = ({
           }}
         >
           <img
-            src={isBase64Url(selectedImageURLLogo)}
+            src={getImageURL(selectedImageURLLogo)}
             alt="Selected Image"
             style={{
               width: "120px",
-              borderRadius: "50%",
+              borderRadius: "16px",
               height: "120px",
             }}
           />
           <Button
             variant="text"
-            onClick={() => handleRemoveImageLogo(0)} // Pass the index to the remove function
+            onClick={() => handleRemoveImageLogo(index)} // Pass the index to the remove function
             size="small"
             sx={{
               position: "absolute",
@@ -117,17 +114,15 @@ const IstLogo = ({
         style={{
           position: "absolute",
           top: 0,
-          left: "20%",
-          width: "50%",
-          height: "50%",
+          left: 0,
+          width: "100%",
+          height: "100%",
           cursor: "pointer",
           opacity: 0,
-          zIndex: 1,
+          zIndex: 1111,
         }}
-        onChange={(event) => handleFileSelectLogo(event, 0)}
+        onChange={handleChange}
       />
     </Box>
   );
-};
-
-export default IstLogo;
+}

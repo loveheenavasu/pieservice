@@ -14,7 +14,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
-import data from "../../login.json"
+import data from "../../login.json";
 import { useRouter } from "next/navigation";
 import login from "@/services/authentication";
 
@@ -39,14 +39,14 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function Login() {
-  console.log(data,"data");
-  const router = useRouter()
-  
+  console.log(data, "data");
+  const router = useRouter();
+
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
   });
-  const [ error, setError] = React.useState("")
+  const [error, setError] = React.useState("");
 
   const handleChange = (event: { target: { name: any; value: any } }) => {
     const { name, value } = event.target;
@@ -55,28 +55,19 @@ export default function Login() {
       [name]: value,
     });
   };
- 
 
+  const handleSubmit = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
 
-    const handleSubmit = (event: { preventDefault: () => void; }) => {
-      event.preventDefault();
-      
-      const response = login(formData.email, formData.password);
-      if(response.success) {
-        Cookies.set('authToken', response.data?.token);
-        Cookies.set('user', response.data?.user);
-        router.replace('/header');
-      }else {
-        setError(response.error?.message || 'Please try again');
-      }
-    };
-  
-
-  //   const handleSignIn = () => {
-  //     fetch("/login")
-  //       .then((res) => console.log(res))
-  //       .catch((err) => console.log(err));
-  //   };
+    const response = login(formData.email, formData.password);
+    if (response.success) {
+      Cookies.set("authToken", response?.data?.token ?? "");
+      Cookies.set("user", (response?.data?.user as any) ?? "");
+      router.replace("/header");
+    } else {
+      setError(response.error?.message || "Please try again");
+    }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -138,7 +129,7 @@ export default function Login() {
             >
               Sign In
             </Button>
-            <Typography color="red" >{error}</Typography>
+            <Typography color="red">{error}</Typography>
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">

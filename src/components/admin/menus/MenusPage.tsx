@@ -5,17 +5,15 @@ import {
   Box,
   FormControl,
   Button,
-  Select,
-  MenuItem,
   Typography,
   Container,
   Grid,
   Paper,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
+
 import ControlPointDuplicateRoundedIcon from "@mui/icons-material/ControlPointDuplicateRounded";
-import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
+
 import Layout from "../layout/Layout";
 import { addMenus, getMenus } from "@/services/menus";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -42,12 +40,12 @@ const MenusPage = () => {
     const { name, value } = event.target;
     console.log(formDataArray, "lsafoweur");
     setFormDataArray((prevDataArray) => {
-    const newDataArray = [...prevDataArray];
-    newDataArray[index] = {
-      ...newDataArray[index],
-      [name]: value,
-    };
-    return newDataArray;
+      const newDataArray = [...prevDataArray];
+      newDataArray[index] = {
+        ...newDataArray[index],
+        [name]: value,
+      };
+      return newDataArray;
     });
   };
   const handleRemoveImage = (indexToRemove: number) => {
@@ -129,7 +127,7 @@ const MenusPage = () => {
                     <ControlPointDuplicateRoundedIcon fontSize="large" />
                   </Button>
                 </Box>
-                {console.log(formDataArray, "ljaflasjfslajdadsjf")}
+
                 {formDataArray?.map((formData, index) => (
                   <Box
                     key={index}

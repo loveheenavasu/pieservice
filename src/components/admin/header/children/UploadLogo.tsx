@@ -1,10 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { Button, Box, Typography } from "@mui/material";
 import React from "react";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import CloudUploadTwoToneIcon from "@mui/icons-material/CloudUploadTwoTone";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { getImageURL } from "@/utils/images";
 
 const UploadLogo = ({
   selectedImageURLLogo,
@@ -31,7 +31,7 @@ const UploadLogo = ({
           }}
         >
           <img
-            src={`https://piemultilingualbackend.onrender.com/1694770802618_0.6751337728686013.png`}
+            src={getImageURL(selectedImageURLLogo)}
             alt="Selected Image"
             style={{ maxWidth: "200px", maxHeight: "200px" }}
           />

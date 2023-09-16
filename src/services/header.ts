@@ -1,12 +1,18 @@
 import AXIOS from "@/axios";
 
 // TODO: add types
-export function addHeader({ headerIcon, extension, links }: any) {
+export function addHeader({
+  headerIcon,
+  extension,
+  links,
+  headerIconBase64,
+}: any) {
   try {
     const response = AXIOS.post("/header", {
       headerIcon,
       extension,
       data: links,
+      headerIconBase64,
     });
     console.log(response, "responseresponseresponseresponse");
   } catch (error) {
