@@ -5,19 +5,31 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import CloudUploadTwoToneIcon from "@mui/icons-material/CloudUploadTwoTone";
 import CancelIcon from "@mui/icons-material/Cancel";
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
+import { ImageOutlined } from "@mui/icons-material";
 
 const IstLogo = ({
   selectedImageURLLogo,
   handleFileSelectLogo,
   handleRemoveImageLogo,
+  setSelectedImages,
   index, // Add the index prop to determine which image to display
 }: any) => {
+  const isBase64Url = () => {
+    const regex =
+      /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+    let val = regex.test(selectedImageURLLogo);
+    let imgurl = "";
+    if (selectedImageURLLogo?.length > 500) {
+      imgurl = selectedImageURLLogo;
+    } else {
+      imgurl = `https://piemultilingualbackend.onrender.com/${selectedImageURLLogo}`;
+    }
+    console.log(imgurl, "asfksaldjflsjd", val);
+    return imgurl;
+  };
 
-  console.log(selectedImageURLLogo?.imageUrl,"imageURL");
-  
-
+  console.log(isBase64Url(selectedImageURLLogo), "0823402384");
   return (
     <Box
       sx={{
@@ -27,7 +39,7 @@ const IstLogo = ({
         position: "relative",
       }}
     >
-      {selectedImageURLLogo?.imageUrl ? ( // Use imageURL to check if an image is available
+      {selectedImageURLLogo ? ( // Use imageURL to check if an image is available
         <Box
           sx={{
             display: "flex",
@@ -38,9 +50,13 @@ const IstLogo = ({
           }}
         >
           <img
-            src={selectedImageURLLogo?.imageUrl}
+            src={isBase64Url(selectedImageURLLogo)}
             alt="Selected Image"
-            style={{ maxWidth: "200px", maxHeight: "200px" }}
+            style={{
+              width: "120px",
+              borderRadius: "50%",
+              height: "120px",
+            }}
           />
           <Button
             variant="text"
@@ -108,11 +124,10 @@ const IstLogo = ({
           opacity: 0,
           zIndex: 1,
         }}
-        onChange={(event) => handleFileSelectLogo(event, 0)} // Pass the correct index
+        onChange={(event) => handleFileSelectLogo(event, 0)}
       />
     </Box>
   );
 };
 
 export default IstLogo;
-

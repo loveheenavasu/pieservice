@@ -31,7 +31,7 @@ const UploadLogo = ({
           }}
         >
           <img
-            src={selectedImageURLLogo}
+            src={`https://piemultilingualbackend.onrender.com/1694770802618_0.6751337728686013.png`}
             alt="Selected Image"
             style={{ maxWidth: "200px", maxHeight: "200px" }}
           />

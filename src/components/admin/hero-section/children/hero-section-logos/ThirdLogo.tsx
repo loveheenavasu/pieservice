@@ -5,8 +5,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import CloudUploadTwoToneIcon from "@mui/icons-material/CloudUploadTwoTone";
 import CancelIcon from "@mui/icons-material/Cancel";
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 
 const ThirdLogo = ({
   selectedImageURLLogo,
@@ -22,7 +21,7 @@ const ThirdLogo = ({
         position: "relative",
       }}
     >
-      {selectedImageURLLogo?.imageUrl ? (
+      {selectedImageURLLogo ? (
         <Box
           sx={{
             display: "flex",
@@ -33,9 +32,13 @@ const ThirdLogo = ({
           }}
         >
           <img
-            src={selectedImageURLLogo?.imageUrl}
+            src={`https://piemultilingualbackend.onrender.com/${selectedImageURLLogo}`}
             alt="Selected Image"
-            style={{ maxWidth: "200px", maxHeight: "200px" }}
+            style={{
+              width: "120px",
+              borderRadius: "50%",
+              height: "120px",
+            }}
           />
           <Button
             variant="text"
@@ -63,19 +66,19 @@ const ThirdLogo = ({
             margin: "10px 0px 0px 0",
           }}
         >
-            <Box
+          <Box
             style={{
-                color: "#000",
-                borderRadius: "3%",
-                // border: "none",
-                boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
-                border: "1px dashed black",
-                height: "100px",
-                width: " 110px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+              color: "#000",
+              borderRadius: "3%",
+              // border: "none",
+              boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+              border: "1px dashed black",
+              height: "100px",
+              width: " 110px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
             <Box
               sx={{
@@ -85,7 +88,7 @@ const ThirdLogo = ({
                 alignItems: "center",
               }}
             >
-<LibraryAddIcon fontSize="small" />
+              <LibraryAddIcon fontSize="small" />
               <Typography>Third logo</Typography>
             </Box>
           </Box>

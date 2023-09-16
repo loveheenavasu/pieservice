@@ -32,6 +32,7 @@ const HeaderLinks = () => {
       extension: "",
     },
   ]);
+  console.log(formDataArray, "formDadddtadArray");
   const [base64Image, setBase64Image] = useState("");
   const [logoExtension, setLogoExtension] = useState<string | null>(null);
 
@@ -43,14 +44,14 @@ const HeaderLinks = () => {
   useEffect(() => {
     getHeader().then((res) => {
       setHeaderData(res?.data);
-      setFormDataArray(res?.data?.data || []);
+      setFormDataArray(res?.data?.data);
       setSelectedImageURLLogo({
         imageURL: res?.data?.headerLogo || "",
       });
     });
   }, []);
-  console.log(formDataArray,"formdataarray");
-  
+  console.log(formDataArray, "formdataarray");
+
   console.log(headerData, "headerdata");
   console.log(selectedImageURLLogo, "hghg");
 
@@ -137,20 +138,19 @@ const HeaderLinks = () => {
     setFormDataArray((prevDataArray) => {
       // Create a copy of the previous data array
       const newDataArray = [...prevDataArray];
-  
+
       // Create a copy of the object at the specified index
       const updatedObject = { ...newDataArray[indexToRemove] };
-  
+
       // Remove the 'icon' property from the object
       delete updatedObject.icon;
-  
+
       // Update the newDataArray with the modified object
       newDataArray[indexToRemove] = updatedObject;
-  
+
       return newDataArray;
     });
   };
-  
 
   // Handle submit
   const handleSubmit = async () => {
@@ -162,24 +162,18 @@ const HeaderLinks = () => {
       extension: selectedImageURLLogo.extension,
     });
   };
-
+  console.log(selectedImageURLLogo, "selectedImageURLLogo");
   const handleAddFields = () => {
-    setFormDataArray((prevDataArray) => {
-      // Create a new object for the new field
-      const newField = {
-        name: "",
-        link: "",
-        icon: "",
-        extension: "",
-      };
-
-      // Add the new field to the end of the array
-      const newDataArray = [...prevDataArray, newField];
-
-      return newDataArray;
-    });
+    const newField = {
+      name: "",
+      link: "",
+      icon: "",
+      extension: "",
+    };
+    let data = [...formDataArray, newField];
+    setFormDataArray(data);
   };
-
+  console.log(formDataArray, "fossrmDataArray");
   const handleRemoveImageLogo = () => {
     setSelectedImageURLLogo({
       imageURL: "",
@@ -207,13 +201,16 @@ const HeaderLinks = () => {
           mt: 2,
         }}
       >
+        {console.log(
+          selectedImageURLLogo.imageURL,
+          "selectedImageURLLogo.imageURL"
+        )}
         <UploadLogo
           selectedImageURLLogo={selectedImageURLLogo.imageURL}
           handleFileSelectLogo={handleFileSelectLogo}
           // base64Image={base64Image}
           handleRemoveImageLogo={handleRemoveImageLogo}
         />
-
         <Box
           sx={{
             display: "flex",
@@ -230,127 +227,121 @@ const HeaderLinks = () => {
           </Button>
         </Box>
 
-        {formDataArray.map((formData, index) => {
-          console.log(formData?.icon,"formdata.icon");
-          
-          return(
-
+        {formDataArray?.map((formData, index) => {
+          return (
             <Box
-            key={index}
-            sx={{
-              display: "flex",
-              justifyContent: "cente",
-              alignItems: "center",
-            }}
-          >
-            <Box
+              key={index}
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent: "cente",
                 alignItems: "center",
-                width: "100%",
               }}
             >
-              <FormControl variant="outlined" sx={{ my: 2, width: "45%" }}>
-                <TextField
-                  sx={{ width: "95%" }}
-                  label={"Header Text"}
-                  variant="outlined"
-                  value={formData.name}
-                  onChange={(event) => handleHeaderLinkChange(event, index)}
-                  name="name"
-                  size="small"
-                />
-              </FormControl>
-              <FormControl variant="outlined" sx={{ my: 1, width: "45%" }}>
-                <TextField
-                  sx={{ width: "95%" }}
-                  label={"Header Link"}
-                  variant="outlined"
-                  value={formData.link}
-                  onChange={(event) => handleHeaderLinkChange(event, index)}
-                  name="link"
-                  size="small"
-                />
-              </FormControl>
-              {/* Assuming you have an array of form data objects */}
-              <FormControl
-                key={index}
-                variant="outlined"
-                sx={{ my: 0, width: "15%" }}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%",
+                }}
               >
-                {!formData?.icon ? (
-                  <>
+                <FormControl variant="outlined" sx={{ my: 2, width: "45%" }}>
+                  <TextField
+                    sx={{ width: "95%" }}
+                    label={"Header Text"}
+                    variant="outlined"
+                    value={formData.name}
+                    onChange={(event) => handleHeaderLinkChange(event, index)}
+                    name="name"
+                    size="small"
+                  />
+                </FormControl>
+                <FormControl variant="outlined" sx={{ my: 1, width: "45%" }}>
+                  <TextField
+                    sx={{ width: "95%" }}
+                    label={"Header Link"}
+                    variant="outlined"
+                    value={formData.link}
+                    onChange={(event) => handleHeaderLinkChange(event, index)}
+                    name="link"
+                    size="small"
+                  />
+                </FormControl>
+                {/* Assuming you have an array of form data objects */}
+                <FormControl
+                  key={index}
+                  variant="outlined"
+                  sx={{ my: 0, width: "15%" }}
+                >
+                  {!formData?.icon ? (
+                    <>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                          cursor: "pointer",
+                          margin: "20px 0px 30px 0",
+                        }}
+                      >
+                        <Button
+                          style={{
+                            color: "#000",
+                            border: "none",
+                            boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+                          }}
+                          variant="outlined"
+                        >
+                          icon
+                          <FileUploadIcon />
+                        </Button>
+                      </div>
+
+                      <input
+                        type="file"
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          cursor: "pointer",
+                          opacity: 0,
+                        }}
+                        onChange={(event) => handleFileSelect(event, index)}
+                      />
+                    </>
+                  ) : (
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "flex-start",
-                        cursor: "pointer",
-                        margin: "20px 0px 30px 0",
+                        position: "relative",
+                        display: "inline-block",
                       }}
                     >
-                      
+                      <img
+                        src={`https://piemultilingualbackend.onrender.com/${formData?.icon}`}
+                        alt="Selected Image"
+                        style={{ maxWidth: "60px", maxHeight: "60px" }}
+                      />
                       <Button
                         style={{
-                          color: "#000",
-                          border: "none",
-                          boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+                          position: "absolute",
+                          top: "-13px",
+                          right: "69px",
                         }}
-                        variant="outlined"
+                        size="small"
+                        variant="text"
+                        onClick={() => handleRemoveImage(index)}
                       >
-                        icon
-                        <FileUploadIcon />
+                        <CancelRoundedIcon fontSize="small" />
                       </Button>
                     </div>
-
-                    <input
-                      type="file"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        cursor: "pointer",
-                        opacity: 0,
-                      }}
-                      onChange={(event) => handleFileSelect(event, index)}
-                    />
-                  </>
-                ) : (
-                  <div
-                    style={{
-                      position: "relative",
-                      display: "inline-block",
-                    }}
-                  >
-                    <img
-                      src={ formData?.icon }
-                      alt="Selected Image"
-                      style={{ maxWidth: "60px", maxHeight: "60px" }}
-                    />
-                    <Button
-                      style={{
-                        position: "absolute",
-                        top: "-13px",
-                        right: "69px",
-                      }}
-                      size="small"
-                      variant="text"
-                      onClick={() => handleRemoveImage(index)}
-                    >
-                      <CancelRoundedIcon fontSize="small" />
-                    </Button>
-                  </div>
-                )}
-              </FormControl>
+                  )}
+                </FormControl>
+              </Box>
             </Box>
-          </Box>
-          )
-          
-
-})}
+          );
+        })}
       </Paper>
     </>
   );

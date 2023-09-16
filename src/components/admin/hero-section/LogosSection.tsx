@@ -6,43 +6,56 @@ import IstLogo from "./children/hero-section-logos/IstLogo";
 import SecondLogo from "./children/hero-section-logos/SecondLogo";
 import ThirdLogo from "./children/hero-section-logos/ThirdLogo";
 
-const LogosSection = ({selectedImages,handleFileSelectLogo, removeImageByIndex}:any) => {
-
+const LogosSection = ({
+  selectedImages,
+  handleFileSelectLogo,
+  removeImageByIndex,
+  heroData,
+  setSelectedImages,
+}: any) => {
   //
 
   return (
-    <Box  sx={{mt:2}}>
-    <Typography sx={{fontSize:"18px"}}>
-     Trusted Client Logos
-    </Typography>
-    <Box sx={{display:'flex', justifyContent:'start', width:'100%', gap:'20px'}}>
-     <IstLogo
-        selectedImageURLLogo={selectedImages[0]}
-        handleFileSelectLogo={handleFileSelectLogo}
-        handleRemoveImageLogo={removeImageByIndex}
-      />
-      <SecondLogo
-        selectedImageURLLogo={selectedImages[1]}
-        handleFileSelectLogo={handleFileSelectLogo}
-        handleRemoveImageLogo={removeImageByIndex}
-
-      />
-      <ThirdLogo
-        selectedImageURLLogo={selectedImages[2]}
-        handleFileSelectLogo={handleFileSelectLogo}
-        handleRemoveImageLogo={removeImageByIndex}
-
-      />
-      <ForthLogo
-        selectedImageURLLogo={selectedImages[3]}
-        handleFileSelectLogo={handleFileSelectLogo}
-        handleRemoveImageLogo={removeImageByIndex}
-
-      />
+    <Box sx={{ mt: 2 }}>
+      <Typography sx={{ fontSize: "18px" }}>Trusted Client Logos</Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "start",
+          width: "100%",
+          gap: "20px",
+        }}
+      >
+        {console.log(
+          selectedImages?.[0]?.imageUrl,
+          "selectedImages?.[0]?.imageUrl"
+        )}
+        <IstLogo
+          selectedImageURLLogo={selectedImages?.[0]?.imageUrl}
+          handleFileSelectLogo={handleFileSelectLogo}
+          handleRemoveImageLogo={removeImageByIndex}
+          setSelectedImages={setSelectedImages}
+        />
+        <SecondLogo
+          selectedImageURLLogo={selectedImages?.[1]?.imageUrl}
+          handleFileSelectLogo={handleFileSelectLogo}
+          handleRemoveImageLogo={removeImageByIndex}
+          setSelectedImages={setSelectedImages}
+        />
+        <ThirdLogo
+          selectedImageURLLogo={selectedImages?.[2]?.imageUrl}
+          handleFileSelectLogo={handleFileSelectLogo}
+          handleRemoveImageLogo={removeImageByIndex}
+          setSelectedImages={setSelectedImages}
+        />
+        <ForthLogo
+          selectedImageURLLogo={selectedImages?.[3]?.imageUrl}
+          handleFileSelectLogo={handleFileSelectLogo}
+          handleRemoveImageLogo={removeImageByIndex}
+          setSelectedImages={setSelectedImages}
+        />
+      </Box>
     </Box>
-
-    </Box>
-    
   );
 };
 

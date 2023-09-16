@@ -13,34 +13,37 @@ import { addHeader } from "@/services/header";
 import { addHero, getHero, updateHero } from "@/services/hero";
 
 const HeroSectionPage = () => {
-  const [selectedImageUrlBanner, setSelectedImageUrlBanner] = useState({
+  const [selectedImageUrlBanner, setSelectedImageUrlBanner] = useState<any>({
     imageUrl: "",
     extension: "",
   });
-  const [heroData, setHeroData] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<any>(null);
 
+  const [heroData, setHeroData] = useState(null);
+  let base64DataUrl = "";
   const handleFileSelect = (
     event: React.ChangeEvent<HTMLInputElement> | null
   ) => {
-    const file = event?.target?.files?.[0] || null;
-
+    const file = event?.target?.files || null;
+    setSelectedFile(URL.createObjectURL(event.target.files[0]) || null);
     if (file) {
-      const extension = file.name.split(".").pop() || "";
-
+      console.log("sjdsjdhsdjfhsdf");
       const reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
       reader.onload = (e) => {
-        const base64DataUrl = e?.target?.result as string;
-
+        base64DataUrl = e?.target?.result as string;
+        console.log(base64DataUrl, "sfaljsaf");
+        const extension = file?.[0]?.name.split(".").pop() || "";
         setSelectedImageUrlBanner({
-          imageUrl: base64DataUrl,
-          extension,
+          imageUrl: base64DataUrl ?? "",
+          extension: extension,
         });
       };
-      reader.readAsDataURL(file);
     }
   };
 
   const handleRemoveImage = () => {
+    setSelectedFile(null);
     setSelectedImageUrlBanner({
       imageUrl: "",
       extension: "",
@@ -54,28 +57,39 @@ const HeroSectionPage = () => {
     { imageUrl: "", extension: "" },
   ]);
 
+  console.log(selectedImages, "selectedImages");
   const handleFileSelectLogo = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
     const file = event.target.files?.[0] || null;
-
+    console.log(file, "ljasdkflwjjljasjfldsjfljs");
     if (file) {
       const imageUrl = URL.createObjectURL(file);
+      console.log(imageUrl, "ljasdafdsadfkflwjjl");
       const extension = file.name.split(".").pop() || "";
+      const data = {
+        imageUrl: imageUrl.split("/").pop() + extension,
+        extension: extension,
+      };
+      setSelectedImages((prev) => [...prev, data]);
 
       // Read the file as a base64 data URL
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64DataUrl = e?.target?.result as string;
-
+        console.log(base64DataUrl, "base64DataUrl");
         setSelectedImages((prevDataArray) => {
+          console.log(prevDataArray, "prevDataArray", index);
+          console.log(base64DataUrl, "prevDataArraybase64DataUrl", index);
           const newDataArray = [...prevDataArray];
           newDataArray[index] = {
             ...newDataArray[index],
             imageUrl: base64DataUrl,
             extension: extension,
           };
+          console.log(newDataArray, "newDataArray", index);
+
           return newDataArray;
         });
       };
@@ -95,6 +109,7 @@ const HeroSectionPage = () => {
   };
 
   const handleSave = async () => {
+    console.log(selectedImageUrlBanner, "selectedImageUrlBanner");
     await addHero({
       data: selectedImages,
       heroSection: selectedImageUrlBanner,
@@ -116,14 +131,12 @@ const HeroSectionPage = () => {
     });
   }, []);
 
-  const handleUpdate =()=>{
+  const handleUpdate = () => {
     updateHero({
       data: selectedImages,
       heroSection: selectedImageUrlBanner,
-    })
-  }
-
-  console.log(selectedImages, "selectedimages");
+    });
+  };
 
   return (
     <Layout>
@@ -140,10 +153,10 @@ const HeroSectionPage = () => {
                 mt: 7,
               }}
             >
-               <Button onClick={handleUpdate} variant="contained">
+              {/* <Button onClick={handleUpdate} variant="contained">
                 update
-              </Button>
-              <Button onClick={handleSave} variant="contained">
+              </Button> */}
+              <Button onClick={() => handleSave()} variant="contained">
                 Save
               </Button>
             </Box>
@@ -157,7 +170,7 @@ const HeroSectionPage = () => {
               }}
             >
               <Typography sx={{ my: 2 }} variant="h4">
-                Hero Section
+                Hero Section{" "}
               </Typography>
               <Box
                 sx={{
@@ -167,7 +180,7 @@ const HeroSectionPage = () => {
                   position: "relative",
                 }}
               >
-                {selectedImageUrlBanner.imageUrl ? (
+                {selectedImageUrlBanner?.imageUrl || selectedFile ? (
                   <Box
                     sx={{
                       display: "flex",
@@ -178,9 +191,17 @@ const HeroSectionPage = () => {
                     }}
                   >
                     <img
-                      src={selectedImageUrlBanner?.imageUrl}
-                      alt="Selected Image"
-                      style={{ maxWidth: "200px", maxHeight: "200px" }}
+                      src={
+                        selectedFile
+                          ? selectedFile
+                          : `https://piemultilingualbackend.onrender.com/${heroData?.heroSectionLogo}`
+                      }
+                      alt="Image not foundd"
+                      style={{
+                        width: "120px",
+                        borderRadius: "50%",
+                        height: "120px",
+                      }}
                     />
                     <Button
                       variant="text"
@@ -252,6 +273,8 @@ const HeroSectionPage = () => {
                 handleFileSelectLogo={handleFileSelectLogo}
                 selectedImages={selectedImages}
                 removeImageByIndex={removeImageByIndex}
+                setSelectedImages={setSelectedImages}
+                heroData={heroData}
               />
             </Paper>
           </Grid>

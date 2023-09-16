@@ -5,14 +5,14 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import CloudUploadTwoToneIcon from "@mui/icons-material/CloudUploadTwoTone";
 import CancelIcon from "@mui/icons-material/Cancel";
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 
 const ForthLogo = ({
   selectedImageURLLogo,
   handleFileSelectLogo,
   handleRemoveImageLogo,
 }: any) => {
+  console.log(selectedImageURLLogo, "selectedImageURLLogo");
   return (
     <Box
       sx={{
@@ -22,7 +22,7 @@ const ForthLogo = ({
         position: "relative",
       }}
     >
-      {selectedImageURLLogo?.imageUrl ? (
+      {selectedImageURLLogo ? (
         <Box
           sx={{
             display: "flex",
@@ -33,9 +33,13 @@ const ForthLogo = ({
           }}
         >
           <img
-            src={selectedImageURLLogo?.imageUrl}
+            src={`https://piemultilingualbackend.onrender.com/${selectedImageURLLogo}`}
             alt="Selected Image"
-            style={{ maxWidth: "200px", maxHeight: "200px" }}
+            style={{
+              width: "120px",
+              borderRadius: "50%",
+              height: "120px",
+            }}
           />
           <Button
             variant="text"

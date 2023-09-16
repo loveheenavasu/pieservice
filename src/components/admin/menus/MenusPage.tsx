@@ -12,38 +12,42 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import ControlPointDuplicateRoundedIcon from "@mui/icons-material/ControlPointDuplicateRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import Layout from "../layout/Layout";
 import { addMenus, getMenus } from "@/services/menus";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const MenusPage = () => {
   const [selectedImageURLs, setSelectedImageURLs] = React.useState<
     Array<string>
   >([]);
   const [menusData, setMenusData] = useState(null);
-
+  const [loading, setLoading] = useState(false);
+  console.log(loading, "loading");
   const [formDataArray, setFormDataArray] = React.useState([
     {
       name: "",
       link: "",
     },
   ]);
-
+  console.log(formDataArray, "formDataArraysadfsadf");
+  console.log(formDataArray, "formDataArray");
   const handlelinkChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index: number
   ) => {
     const { name, value } = event.target;
+    console.log(formDataArray, "lsafoweur");
     setFormDataArray((prevDataArray) => {
-      const newDataArray = [...prevDataArray];
-      newDataArray[index] = {
-        ...newDataArray[index],
-        [name]: value,
-      };
-      return newDataArray;
+    const newDataArray = [...prevDataArray];
+    newDataArray[index] = {
+      ...newDataArray[index],
+      [name]: value,
+    };
+    return newDataArray;
     });
   };
   const handleRemoveImage = (indexToRemove: number) => {
@@ -55,29 +59,33 @@ const MenusPage = () => {
   };
 
   const handleSubmit = () => {
-    addMenus({ menus: formDataArray });
+    addMenus(formDataArray, setLoading);
   };
+  console.log(formDataArray, "formDataArray");
 
   const handleAddFields = () => {
-    setFormDataArray((prevDataArray): any => {
-      // Create a new object for the new field
-      const newField = {
-        name: "",
-        link: "",
-      };
+    const newField = {
+      name: "",
+      link: "",
+    };
+    const updatedData = [...formDataArray, newField];
 
-      // Add the new field to the end of the array
-      const newDataArray = [...prevDataArray, newField];
-      return newDataArray;
-    });
+    setFormDataArray(updatedData);
   };
 
   useEffect(() => {
     getMenus().then((res) => {
-      setMenusData(res?.data)
-      setFormDataArray(res?.data)
-    } );
+      console.log(res, "jfaslfjsajf");
+      setMenusData(res?.data);
+      console.log(res?.data, "lasdfjasljf");
+      setFormDataArray(res?.data);
+    });
   }, []);
+  const handleDelete = (index: number) => {
+    console.log(index, "sadfahsfsdfdsljf");
+    const data = formDataArray?.filter((_, i) => i !== index);
+    setFormDataArray(data);
+  };
 
   return (
     <>
@@ -92,9 +100,10 @@ const MenusPage = () => {
                   variant="contained"
                   color="primary"
                   onClick={handleSubmit}
+                  disabled={loading}
                   sx={{ mt: 2, padding: "5px 30px" }}
                 >
-                  Save
+                  {loading ? <CircularProgress /> : "Save"}
                 </Button>
               </Box>
               <Paper
@@ -120,7 +129,8 @@ const MenusPage = () => {
                     <ControlPointDuplicateRoundedIcon fontSize="large" />
                   </Button>
                 </Box>
-                {formDataArray.map((formData, index) => (
+                {console.log(formDataArray, "ljaflasjfslajdadsjf")}
+                {formDataArray?.map((formData, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -166,6 +176,14 @@ const MenusPage = () => {
                         />
                       </FormControl>
                     </Box>
+                    <div
+                      style={{ cursor: "pointer" }}
+                      onClick={(e) => {
+                        handleDelete(index);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </div>
                   </Box>
                 ))}
               </Paper>
