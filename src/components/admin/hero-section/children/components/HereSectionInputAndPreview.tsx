@@ -20,7 +20,9 @@ export function HereSectionInputAndPreview({
   handleRemoveImage,
   handleFileSelect,
 }: HereSectionInputAndPreviewProps) {
-  const { imageUrl = "", base64 = "" } = selectedImageUrlBanner;
+  const imageUrl = selectedImageUrlBanner?.imageUrl || "";
+  const base64 = selectedImageUrlBanner?.base64 || "";
+
   return (
     <>
       <Typography sx={{ my: 2 }} variant="h4">
