@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useEffect, useState } from "react";
 import {
@@ -5,8 +6,6 @@ import {
   Box,
   FormControl,
   Button,
-  Select,
-  MenuItem,
   Typography,
   Paper,
 } from "@mui/material";
@@ -16,15 +15,25 @@ import ControlPointDuplicateRoundedIcon from "@mui/icons-material/ControlPointDu
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import UploadLogo from "./UploadLogo";
 import { addHeader, getHeader } from "@/services/header";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { fileToBase64URL, getFileExtension, getImageURL } from "@/utils/images";
+
+interface FormDataType {
+  name: string;
+  link: string;
+  icon?: string;
+  extension?: string;
+  base64?: string;
+}
+
+interface HeaderImageProps {
+  headerLogo?: string;
+  extension?: string;
+  headerIconBase64?: string;
+}
 
 const HeaderLinks = () => {
-  const [selectedImageURLs, setSelectedImageURLs] = React.useState<
-    Array<string>
-  >([]);
-
-  const [headerData, setHeaderData] = useState(null);
-
-  const [formDataArray, setFormDataArray] = React.useState([
+  const [formDataArray, setFormDataArray] = React.useState<FormDataType[]>([
     {
       name: "",
       link: "",
@@ -32,82 +41,66 @@ const HeaderLinks = () => {
       extension: "",
     },
   ]);
-  const [base64Image, setBase64Image] = useState("");
-  const [logoExtension, setLogoExtension] = useState<string | null>(null);
 
-  const [selectedImageURLLogo, setSelectedImageURLLogo] = useState({
-    imageURL: "",
-    extension: "",
-  });
+  const [selectedImageURLLogo, setSelectedImageURLLogo] =
+    useState<HeaderImageProps>({
+      headerLogo: "",
+      extension: "",
+      headerIconBase64: "",
+    });
 
   useEffect(() => {
     getHeader().then((res) => {
-      setHeaderData(res?.data);
-      setFormDataArray(res?.data?.data || []);
+      setFormDataArray(res?.data?.data);
       setSelectedImageURLLogo({
-        imageURL: res?.data?.headerLogo || "",
+        headerLogo: res?.data?.headerLogo || "",
+        extension: "",
       });
     });
   }, []);
-  console.log(formDataArray,"formdataarray");
-  
-  console.log(headerData, "headerdata");
-  console.log(selectedImageURLLogo, "hghg");
 
-  const handleFileSelectLogo = (
+  const handleFileSelectLogo = async (
     event: React.ChangeEvent<HTMLInputElement> | null
   ) => {
     const file = event?.target?.files?.[0] || null;
 
     if (file) {
-      const extension = file.name.split(".").pop() || "";
+      const extension = getFileExtension(file);
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64DataUrl = e?.target?.result as string;
+      const base64 = await fileToBase64URL(file);
 
+      if (typeof base64 === "string") {
         setSelectedImageURLLogo({
-          imageURL: base64DataUrl,
+          headerLogo: "",
           extension,
+          headerIconBase64: base64,
         });
-      };
-      reader.readAsDataURL(file);
+      }
     }
   };
 
-  const handleFileSelect = (
+  const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
     const file = event.target.files?.[0] || null;
 
     if (file) {
-      const imageURL = URL.createObjectURL(file);
-      const extension = file.name.split(".").pop();
-
-      // Read the file as a base64 data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64DataUrl = e?.target?.result as string;
-
-        setSelectedImageURLs((prevURLs) => {
-          const newURLs = [...prevURLs];
-          newURLs[index] = imageURL;
-          return newURLs;
-        });
+      const base64 = await fileToBase64URL(file);
+      if (typeof base64 === "string") {
+        const extension = getFileExtension(file);
 
         setFormDataArray((prevDataArray) => {
           const newDataArray = [...prevDataArray];
           newDataArray[index] = {
             ...newDataArray[index],
-            extension: extension!,
-            icon: base64DataUrl,
+            extension: extension,
+            icon: "",
+            base64: base64,
           };
           return newDataArray;
         });
-      };
-
-      reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -125,68 +118,52 @@ const HeaderLinks = () => {
       return newDataArray;
     });
   };
-  // const handleRemoveImage = (indexToRemove: number) => {
-  //   setFormDataArray((prevDataArray) => {
-  //     // Create a copy of the previous data array without the item to remove
-  //     const newDataArray = prevDataArray.filter((_, index) => index !== indexToRemove);
-  //     return newDataArray;
-  //   });
-  // };
 
   const handleRemoveImage = (indexToRemove: number) => {
     setFormDataArray((prevDataArray) => {
-      // Create a copy of the previous data array
       const newDataArray = [...prevDataArray];
-  
-      // Create a copy of the object at the specified index
       const updatedObject = { ...newDataArray[indexToRemove] };
-  
-      // Remove the 'icon' property from the object
       delete updatedObject.icon;
-  
-      // Update the newDataArray with the modified object
       newDataArray[indexToRemove] = updatedObject;
-  
+
       return newDataArray;
     });
   };
-  
 
   // Handle submit
   const handleSubmit = async () => {
-    // Handle uploading file and saving data here
-    console.log("Header Link 1:", selectedImageURLLogo, formDataArray);
     await addHeader({
       links: formDataArray,
-      headerIcon: selectedImageURLLogo.imageURL,
+      headerIcon: selectedImageURLLogo.headerLogo,
       extension: selectedImageURLLogo.extension,
+      headerIconBase64: selectedImageURLLogo.headerIconBase64,
     });
   };
 
   const handleAddFields = () => {
-    setFormDataArray((prevDataArray) => {
-      // Create a new object for the new field
-      const newField = {
-        name: "",
-        link: "",
-        icon: "",
-        extension: "",
-      };
-
-      // Add the new field to the end of the array
-      const newDataArray = [...prevDataArray, newField];
-
-      return newDataArray;
-    });
+    const newField = {
+      name: "",
+      link: "",
+      icon: "",
+      extension: "",
+    };
+    let data = [...(formDataArray || []), newField];
+    setFormDataArray(data);
   };
 
   const handleRemoveImageLogo = () => {
     setSelectedImageURLLogo({
-      imageURL: "",
+      headerLogo: "",
       extension: "",
+      headerIconBase64: "",
     });
-    setBase64Image("");
   };
+
+  const handleDelete = (index: number) => {
+    const data = formDataArray?.filter((_, i) => i !== index);
+    setFormDataArray(data);
+  };
+
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "end", mx: 1 }}>
@@ -208,12 +185,13 @@ const HeaderLinks = () => {
         }}
       >
         <UploadLogo
-          selectedImageURLLogo={selectedImageURLLogo.imageURL}
+          selectedImageURLLogo={
+            selectedImageURLLogo.headerIconBase64 ||
+            selectedImageURLLogo.headerLogo
+          }
           handleFileSelectLogo={handleFileSelectLogo}
-          // base64Image={base64Image}
           handleRemoveImageLogo={handleRemoveImageLogo}
         />
-
         <Box
           sx={{
             display: "flex",
@@ -230,127 +208,131 @@ const HeaderLinks = () => {
           </Button>
         </Box>
 
-        {formDataArray.map((formData, index) => {
-          console.log(formData?.icon,"formdata.icon");
-          
-          return(
-
+        {formDataArray?.map((formData, index) => {
+          return (
             <Box
-            key={index}
-            sx={{
-              display: "flex",
-              justifyContent: "cente",
-              alignItems: "center",
-            }}
-          >
-            <Box
+              key={index}
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent: "cente",
                 alignItems: "center",
-                width: "100%",
               }}
             >
-              <FormControl variant="outlined" sx={{ my: 2, width: "45%" }}>
-                <TextField
-                  sx={{ width: "95%" }}
-                  label={"Header Text"}
-                  variant="outlined"
-                  value={formData.name}
-                  onChange={(event) => handleHeaderLinkChange(event, index)}
-                  name="name"
-                  size="small"
-                />
-              </FormControl>
-              <FormControl variant="outlined" sx={{ my: 1, width: "45%" }}>
-                <TextField
-                  sx={{ width: "95%" }}
-                  label={"Header Link"}
-                  variant="outlined"
-                  value={formData.link}
-                  onChange={(event) => handleHeaderLinkChange(event, index)}
-                  name="link"
-                  size="small"
-                />
-              </FormControl>
-              {/* Assuming you have an array of form data objects */}
-              <FormControl
-                key={index}
-                variant="outlined"
-                sx={{ my: 0, width: "15%" }}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%",
+                }}
               >
-                {!formData?.icon ? (
-                  <>
+                <FormControl variant="outlined" sx={{ my: 2, width: "45%" }}>
+                  <TextField
+                    sx={{ width: "95%" }}
+                    label={"Header Text"}
+                    variant="outlined"
+                    value={formData.name}
+                    onChange={(event) => handleHeaderLinkChange(event, index)}
+                    name="name"
+                    size="small"
+                  />
+                </FormControl>
+                <FormControl variant="outlined" sx={{ my: 1, width: "45%" }}>
+                  <TextField
+                    sx={{ width: "95%" }}
+                    label={"Header Link"}
+                    variant="outlined"
+                    value={formData.link}
+                    onChange={(event) => handleHeaderLinkChange(event, index)}
+                    name="link"
+                    size="small"
+                  />
+                </FormControl>
+                {/* Assuming you have an array of form data objects */}
+                <FormControl
+                  key={index}
+                  variant="outlined"
+                  sx={{ my: 0, width: "10%" }}
+                >
+                  {!formData?.icon && !formData?.base64 ? (
+                    <>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                          cursor: "pointer",
+                          margin: "20px 0px 30px 0",
+                        }}
+                      >
+                        <Button
+                          style={{
+                            color: "#000",
+                            border: "none",
+                            boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+                          }}
+                          variant="outlined"
+                        >
+                          icon
+                          <FileUploadIcon />
+                        </Button>
+                      </div>
+
+                      <input
+                        type="file"
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          cursor: "pointer",
+                          opacity: 0,
+                        }}
+                        onChange={(event) => handleFileSelect(event, index)}
+                      />
+                    </>
+                  ) : (
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "flex-start",
-                        cursor: "pointer",
-                        margin: "20px 0px 30px 0",
+                        position: "relative",
+                        display: "inline-block",
                       }}
                     >
-                      
+                      <img
+                        src={
+                          formData?.base64 || getImageURL(formData?.icon || "")
+                        }
+                        alt="Selected Image"
+                        style={{ maxWidth: "60px", maxHeight: "60px" }}
+                      />
                       <Button
                         style={{
-                          color: "#000",
-                          border: "none",
-                          boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+                          position: "absolute",
+                          top: "-13px",
+                          right: "69px",
                         }}
-                        variant="outlined"
+                        size="small"
+                        variant="text"
+                        onClick={() => handleRemoveImage(index)}
                       >
-                        icon
-                        <FileUploadIcon />
+                        <CancelRoundedIcon fontSize="small" />
                       </Button>
                     </div>
-
-                    <input
-                      type="file"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        cursor: "pointer",
-                        opacity: 0,
-                      }}
-                      onChange={(event) => handleFileSelect(event, index)}
-                    />
-                  </>
-                ) : (
-                  <div
-                    style={{
-                      position: "relative",
-                      display: "inline-block",
-                    }}
-                  >
-                    <img
-                      src={ formData?.icon }
-                      alt="Selected Image"
-                      style={{ maxWidth: "60px", maxHeight: "60px" }}
-                    />
-                    <Button
-                      style={{
-                        position: "absolute",
-                        top: "-13px",
-                        right: "69px",
-                      }}
-                      size="small"
-                      variant="text"
-                      onClick={() => handleRemoveImage(index)}
-                    >
-                      <CancelRoundedIcon fontSize="small" />
-                    </Button>
-                  </div>
-                )}
-              </FormControl>
+                  )}
+                </FormControl>
+              </Box>
+              <div
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  handleDelete(index);
+                }}
+              >
+                <DeleteIcon />
+              </div>
             </Box>
-          </Box>
-          )
-          
-
-})}
+          );
+        })}
       </Paper>
     </>
   );
