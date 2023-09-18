@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import { createTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
@@ -10,6 +9,7 @@ import Switch, { SwitchProps } from "@mui/material/Switch";
 import Layout from "../layout/Layout";
 import { Box, FormControlLabel } from "@mui/material";
 import { toggleSearch } from "@/services/settings";
+import AXIOS from "@/axios";
 const IOSSwitch = styled((props: SwitchProps) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
 ))(({ theme }) => ({
@@ -64,14 +64,21 @@ const IOSSwitch = styled((props: SwitchProps) => (
 const GeneralPage = () => {
   const [isIOSStyle, setIsIOSStyle] = React.useState(false);
 
-  const handleChange = () => {
-    // Toggle the state of isIOSStyle
-    const prev = isIOSStyle
-    setIsIOSStyle(!prev);
-    toggleSearch(!prev)
+  const handleInitialState = async () => {
+    const res = await AXIOS.get("/setting");
+
+    const value = await res?.data;
+    setIsIOSStyle(value?.searchBar);
   };
 
-  console.log(isIOSStyle, "isIOSStyle");
+  React.useEffect(() => {
+    handleInitialState();
+  }, []);
+
+  const handleChange = (checked: boolean) => {
+    setIsIOSStyle(checked);
+    toggleSearch(checked);
+  };
 
   return (
     <>
@@ -90,14 +97,22 @@ const GeneralPage = () => {
                 <Typography sx={{ my: 2 }} variant="h4">
                   General
                 </Typography>
-                <Box sx={{display:'flex', alignItems:'center'}}>
-                    <Typography variant="h5" sx={{fontSize:'18px'}}> Enable Search</Typography>
-                <FormControlLabel
-                  control={<IOSSwitch sx={{ mx: 3  }} onChange={handleChange} />}
-                  label=""
-                />
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography variant="h5" sx={{ fontSize: "18px" }}>
+                    {" "}
+                    Enable Search
+                  </Typography>
+                  <FormControlLabel
+                    control={
+                      <IOSSwitch
+                        sx={{ mx: 3 }}
+                        checked={isIOSStyle}
+                        onChange={(_, checked) => handleChange(checked)}
+                      />
+                    }
+                    label=""
+                  />
                 </Box>
-                
               </Paper>
             </Grid>
           </Grid>
